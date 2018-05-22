@@ -1,0 +1,32 @@
+{
+  "name": "printntnt_app",
+  "version": "0.1.0",
+  "private": true,
+  "main": "main.js",
+  "homepage": ".",
+  "dependencies": {
+    "antd": "^3.5.3",
+    "babel-plugin-import": "^1.7.0",
+    "electron": "^1.4.3",
+    "printer": "^0.2.2",
+    "react": "^16.3.2",
+    "react-app-rewire-less": "^2.1.1",
+    "react-app-rewired": "^1.5.2",
+    "react-dom": "^16.3.2",
+    "react-scripts": "1.1.4"
+  },
+  "scripts": {
+    "start": "react-app-rewired start",
+    "build": "react-scripts build",
+    "test": "react-scripts test --env=jsdom",
+    "eject": "react-scripts eject",
+    "electron": "electron . --debug=5858",
+    "electron-dev": "set ELECTRON_START_URL=http://localhost:3000 && electron .",
+    "dev": "node ./electron-wait-react",
+    "rebuild": "electron-rebuild -f -w app"
+  },
+  "devDependencies": {
+    "electron-rebuild": "^1.7.3",
+    "foreman": "^2.0.0"
+  }
+}
