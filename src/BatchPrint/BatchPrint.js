@@ -1,19 +1,23 @@
 import React, { Component } from 'react';
-const ipc = window.require('electron').ipcRenderer
+import style from './BatchPrint.less'
+import { Link } from 'react-router-dom';
 class BatchPrint extends Component {
     constructor(props) {
         super(props)
         console.log("组件batchPrint初始化")
-        ipc.send('getPrinters', 'ping');
-        ipc.on('getPrinters-reply',(event, msg) => {
-            console.log(msg)
-        })
     }
-    
+
     render() {
         return (
-            <div>
-                123
+            <div className={style.border}>
+                <Link className={style.item} to = '/print/device'>
+                    <i className={style.icon + " iconfont icon-yinxiang"}></i>
+                    <span>设备打印</span>
+                </Link>
+                <Link className={style.item} to = '/print/box'>
+                    <i className={style.icon + " iconfont icon-box1"}></i>
+                    <span >纸箱打印</span>
+                </Link>
             </div>
         );
     }
