@@ -3,6 +3,7 @@ import stl from './LabelDesign.less';
 import { TextElement, BarcodeElement, QrcodeElement, ImageElement } from './desiner-elements'
 import { getRelativeMouse } from "../util/eventUtil"
 import { Button, Select, Input, Tooltip } from "antd"
+import RelationModal from './relationModal/RelationModal'
 import NewImage from './newimage/NewImage'
 
 const Option = Select.Option;
@@ -92,7 +93,15 @@ class LabelDesign extends Component {
     currentTool;
 
     set activeElement(obj) {
-        this.setState({ activeElement: obj })
+        this.setState({ activeElement: obj }, () => {
+            if (obj) {
+                this.dragElementOffset = {
+                    x: obj.x - this.dragLastPosition.x,
+                    y: obj.y - this.dragLastPosition.y,
+                }
+            }
+            this.updateCanvas()
+        })
     }
 
     get activeElement() {
@@ -114,7 +123,8 @@ class LabelDesign extends Component {
         }
         this.state = {
             activeElement: null,
-            newImageVisable: false
+            newImageVisable: false,
+            relationVisible: false
         }
     }
     componentDidMount() {
@@ -122,6 +132,7 @@ class LabelDesign extends Component {
         this.drawingContext = this.canvas.getContext("2d")
         this.init(this.props);
     }
+
     componentWillReceiveProps(nexProps) {
         this.init(nexProps)
     }
@@ -219,8 +230,10 @@ class LabelDesign extends Component {
      * @param {*} e 
      */
     mouseDownCanvas(e) {
+        console.log(this.dragLastPosition, "=====>before");
         var dragStartPosition = getRelativeMouse(e, this.canvas);
         this.dragLastPosition = dragStartPosition;
+        console.log(this.dragLastPosition, "=====>after");
         let newTool = Tools.find(item => item.id === this.currentTool)
         // 如果当前为新建模式
         if (newTool) {
@@ -285,15 +298,6 @@ class LabelDesign extends Component {
     clickTool(item) {
         if (item.id === "image") {
             this.currentTool = ''
-            // let pro = this.dialogService.openConfirm(NewimageComponent)
-            // pro.afterClosed().subscribe(res => {
-            //     if (res) {
-            //         console.log(res);
-            //         this.elements.push(new ImageElement(5, 5, res.width, res.height, res.imgUrl));
-            //         this.activeElement = this.elements[this.elements.length - 1];
-            //         this.updateCanvas()
-            //     }
-            // })
             this.setState({ newImageVisable: true })
             return
         }
@@ -324,8 +328,8 @@ class LabelDesign extends Component {
 
     selectRelation(key, item) {
         if (key === 'relation') {
-            alert("123")
-            this.updateCanvas();
+            console.log(key)
+            this.setState({ relationVisible: true })
         }
     }
 
@@ -344,6 +348,33 @@ class LabelDesign extends Component {
         this.activeElement = this.elements[this.elements.length - 1];
         this.updateCanvas()
         this.setState({ newImageVisable: false })
+    }
+
+    relationOnOk = (e) => {
+        console.log(e)
+        let data = e
+        let item = this.activeElement
+        if (data.type == "deviceProp") {
+            item.relation = data.relationProp.value;
+            switch (data.relationProp.id) {
+                case "printType":
+                    item.text = 'PT-3290C'
+                    break;
+                case "mac":
+                    item.text = '14:2b:9a:00:00:01'
+                    break;
+                case "printName":
+                    item.text = '网络数字前置功率放大器'
+                    break;
+                default:
+                    break;
+            }
+        } else {
+            item.relation = "流水号";
+            item.text = '327020180321001'
+        }
+        this.updateCanvas();
+        this.setState({ relationVisible: false })
     }
 
     render() {
@@ -424,7 +455,8 @@ class LabelDesign extends Component {
                         {this.activeElement && <Button icon='icon-shanchu' className={stl.delete} onClick={this.deleteActive.bind(this)}>删除</Button>}
                     </div>
                 </div>
-                <NewImage visible={this.state.newImageVisable} onOk={this.insertImage} onCancel={e => { console.log(e); this.setState({ newImageVisable: false }) }}></NewImage>
+                <NewImage visible={this.state.newImageVisable} onOk={this.insertImage} onCancel={e => { this.setState({ newImageVisable: false }) }}></NewImage>
+                <RelationModal visible={this.state.relationVisible} onOk={this.relationOnOk} onCancel={e => { console.log(e); this.setState({ relationVisible: false }) }}></RelationModal>
             </div >
         );
     }

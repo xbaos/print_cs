@@ -4,7 +4,7 @@ const port = process.env.PORT ? (process.env.PORT - 100) : 3000;
 console.log(process.env.PORT) //5100
 console.log(port) // 5000
 
-process.env.ELECTRON_START_URL = `http://localhost:${port}`;
+// process.env.ELECTRON_START_URL = `http://localhost:${port}`;
 const exec = require('child_process').exec;
 const client = new net.Socket();
 exec('npm start');
@@ -15,7 +15,7 @@ const tryConnection = () => client.connect({port: port}, () => {
             console.log('starting electron');
             startedElectron = true;
            
-            exec('npm run electron');
+            exec('npm run electron-dev');
         }
     }
 );

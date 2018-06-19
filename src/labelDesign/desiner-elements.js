@@ -150,13 +150,13 @@ function dashedStrock(ctx, x, y, x2, y2, dashArray = [2, 2]) {
     type = "BarcodeElement";
     relation = "";
     disable = ["relation", "type", "width"];
-    constructor(x, y, width, height) {
+    constructor(x, y, width, height, scale) {
       this.text = "123456789";
       this.x = x;
       this.y = y;
       this.width = 100;
       this.height = 100;
-      this.scale = 1.9;
+      this.scale = this.scale || 1.9;
       this.margin = 0;
     }
   

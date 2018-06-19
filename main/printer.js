@@ -1,16 +1,9 @@
-const printer = require("printer");
-const { ipcMain } = require('electron')
+const { ipcMain,app, BrowserWindow, } = require('electron')
+
 const dbTool = require("../db/db_tool")
+const fs = require("fs")
 
 const PrinterAPI = {
-    /**
-     * 获取所有打印机
-     */
-    getPrinters:  () => {
-        let printers = printer.getPrinters();
-        printers = printers.map(item => item.name);
-        return printers
-    },
 
     /**
      * 获取所有打印模板
@@ -20,7 +13,10 @@ const PrinterAPI = {
         return result
     },
 
-    updatePrintTemplate : async (temp) => {
+    /**
+     * 更改或者添加打印模板
+     */
+    updatePrintTemplate: async (temp) => {
         try {
             temp.elements = JSON.stringify(temp.elements);
             let sql
@@ -42,7 +38,29 @@ const PrinterAPI = {
                 msg: error
             }
         }
+    },
+
+    /**
+     * 批量打印
+     */
+    batchPrint: async (data) => {
+        let { urls } = data
+        urls.map(async url => {
+            let base64Data = url.replace(/^data:image\/\w+;base64,/, "");
+            let dataBuffer = Buffer.from(base64Data, "base64")
+            let date = new Date();
+            let saveURL = `${__dirname}\\printimage\\${date.getFullYear()}-${date.getMonth()}-${date.getDate()}_${date.getHours()}${date.getMinutes()}${date.getSeconds()}`
+            fs.writeFileSync(saveURL + ".png", dataBuffer);
+        })
+        winprintp = new BrowserWindow({ width: 1000, height: 800 });
+        winprintp.loadURL(`file://${__dirname}/printimage/index.html`);
+        winprintp.setMenu(null);
+        winprintp.webContents.on('did-finish-load', () => {
+            winprintp.webContents.send('urls', urls);
+        });
+        winprintp.webContents.openDevTools()
     }
+
 }
 
 
@@ -54,6 +72,6 @@ for (let key in PrinterAPI) {
     console.log(key);
     ipcMain.on(key, async (event, args) => {
         let result = await PrinterAPI[key](args)
-        event.sender.send(key+'-reply', result )
+        event.sender.send(key + '-reply', result)
     })
 }
