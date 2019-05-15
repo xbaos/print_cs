@@ -7,7 +7,7 @@ console.log(port) // 5000
 // process.env.ELECTRON_START_URL = `http://localhost:${port}`;
 const exec = require('child_process').exec;
 const client = new net.Socket();
-exec('npm start');
+exec('npm run react-start');
 let startedElectron = false;
 const tryConnection = () => client.connect({port: port}, () => {
         client.end();

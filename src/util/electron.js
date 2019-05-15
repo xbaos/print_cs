@@ -1,5 +1,12 @@
 
-const ipc = window.require('electron').ipcRenderer
+// const ipc = window.require('electron').ipcRenderer
+// const ipc = require('electron').ipcRenderer
+
+// const electron = window.require('electron');
+// const {ipc} = electron;
+const electron = window.require('electron');
+const fs = electron.remote.require('fs');
+const ipc  = electron.ipcRenderer;
 
 class ElecUtil {
     /**
